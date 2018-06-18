@@ -1,0 +1,41 @@
+{
+  "name": "ReactRealm",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build-android": "cd android && ./gradlew assembleReleaseStaging",
+    "run-android-staging": "react-native run-android --variant=releaseStaging",
+    "deploy": "npm run deploy-codepush && npm run build-android",
+    "deploy-codepush": "npm run deploy-codepush-ios && npm run deploy-codepush-android",
+    "deploy-codepush-android": "code-push release-react TweedleNow-Android android --outputDir ./sourcemaps",
+    "deploy-codepush-ios": "code-push release-react Tweedl-iOS iOS -d Staging --sourcemapOutput ./sourcemaps/ios.main.map",
+    "deploy-codepush-ios-production": "code-push release-react Tweedl-iOS iOS -d Production --sourcemapOutput ./sourcemaps/ios.main.map",
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "bundle-ios": "node node_modules/react-native/local-cli/cli.js bundle --dev false --assets-dest ./ios --entry-file index.ios.js --platform ios --bundle-output ./ios/main.jsbundle --sourcemap-output ./sourcemaps/ios.main.map",
+    "bundle-android": "node node_modules/react-native/local-cli/cli.js bundle --dev false --assets-dest ./android/app/src/main/res/ --entry-file index.android.js --platform android  --bundle-output ./android/app/src/main/assets/index.android.bundle --sourcemap-output ./android/app/src/main/assets/android.main.map",
+    "bundle": "concurrently --kill-others \"npm run bundle-ios\" \"npm run bundle-android\"",
+    "test": "echo \"No Tests specified\"",
+    "upload-sourcemaps": "bugsnag-sourcemaps upload --api-key dfc3fe28bc5db5b85e7ba6f0d98bea9c --source-map ./sourcemaps/index.android.bundle.map --strip-project-root --minified-file ./sourcemaps/index.android.bundle --upload-sources --minifiedUrl index.android.bundle",
+    "force:clean": "rm -rf $TMPDIR/react-* && watchman watch-del-all && rm -rf ios/build/ModuleCache/* && rm -rf node_modules/ && npm cache clean && npm i",
+    "adb": "adb reverse tcp:8081 tcp:8081 && adb reverse tcp:8082 tcp:8082 && adb reverse tcp:8090 tcp:8090 && adb reverse tcp:9090 tcp:9090",
+    "shake": "adb shell input keyevent 82",
+    "rr": "npm run adb && adb shell input text \"rr\"",
+    "prettify": "eslint . --fix"
+  },
+  "dependencies": {
+    "react": "16.3.1",
+    "react-native": "0.55.4",
+    "react-native-largelist": "^1.2.12",
+    "react-native-realm": "^0.1.2",
+    "realm": "^2.8.3"
+  },
+  "devDependencies": {
+    "babel-jest": "23.0.1",
+    "babel-preset-react-native": "4.0.0",
+    "jest": "23.1.0",
+    "react-test-renderer": "16.3.1"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
